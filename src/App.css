@@ -1,0 +1,30 @@
+:root {
+  --uls-blue: #434f69;
+  --z-index-GridItem: 10;
+  --z-index-FullView: 30;
+  --z-index-cart: 70;
+  --z-index-shipping: 80;
+  --z-index-checkout: 90;
+}
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: var(--uls-blue) !important;
+  border-color: var(--uls-blue) !important;
+}

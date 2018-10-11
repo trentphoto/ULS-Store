@@ -1,0 +1,39 @@
+.Select {
+    width: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+}
+.Select .input-group-field {
+  text-align: center;
+  width: 40px;
+  height: 40px;
+  background: #f2f2f2;
+  border: none;
+}
+
+.Select .input-group-field::-webkit-inner-spin-button,
+.Select .input-group-field::-webkit-outer-spin-button {
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.Select .input-group-button {
+  background-color: var(--uls-blue);
+  width: 40px;
+  height: 40px;
+  border: none;
+  outline: none;
+  border-radius: 0;
+}
+
+.Select .input-group-button-right {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+.Select .input-group-button-left {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}

@@ -1,0 +1,34 @@
+.GridItem {
+  display: block;
+  background-color: #fff;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.GridItem__overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #434f69;
+  opacity: 0;
+  transform: scale(1.2);
+  padding: 3rem;
+  transition: 300ms ease all;
+}
+
+.GridItem__title {
+  color: #fff;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.GridItem:hover .GridItem__overlay {
+  transform: scale(1);
+  opacity: .9;
+}
