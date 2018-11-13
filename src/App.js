@@ -1,3 +1,8 @@
+import 'raf/polyfill';
+
+import 'core-js/es6/map';
+import 'core-js/es6/set';
+
 import React, { Component } from 'react';
 import { Provider } from 'react-redux'
 import store from './store'
