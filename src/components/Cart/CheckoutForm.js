@@ -21,7 +21,7 @@ class CheckoutForm extends Component {
 
     this.setState({submitting: true});
 
-    const { total, completeCheckout, cartItems } = this.props
+    const { total, completeCheckout, cartItems, shippingInfo } = this.props
     let { token } = await this.props.stripe.createToken({name: "James"});
 
     const cartItemDescriptions = cartItems.map(i => i.name)
@@ -39,7 +39,22 @@ class CheckoutForm extends Component {
 
     if (response.ok) {
       this.setState({done: true})
+
+      const orderInfo = {
+        'shippingInfo': shippingInfo,
+        'order total': total,
+        'cartItems': cartItems,
+      }
+
+      // send order to zapier
+      fetch("https://hooks.zapier.com/hooks/catch/623075/ee9etx/", {
+        method: 'POST',
+        body: JSON.stringify(orderInfo)
+      }).then(() => console.log(1))
+
+      // set app state to checked out - show thank you page
       completeCheckout()
+
     } else {
       this.setState({submitting: false})
       this.setState({error: true})
@@ -72,6 +87,7 @@ class CheckoutForm extends Component {
 
 const mapStateToProps = state => ({
   checkoutComplete: state.cart.checkoutComplete,
+  shippingInfo: state.cart.shippingInfo,
   cartItems: state.cart.cartItems
 })
 
