@@ -3,8 +3,10 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 import { closeCart, cartRemoveItem, showShipping, cartIncreaseItemQty, cartDecreaseItemQty } from '../../actions/cartActions'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import DiscountCodeForm from './DiscountCodeForm'
 import Shipping from './Shipping'
 import Checkout from './Checkout'
+import ThankYou from './ThankYou'
 import './Cart.css'
 import './CartTransitions.css'
 
@@ -15,9 +17,22 @@ const Cart = props => {
   const cartDecreaseItemQty = index => props.cartDecreaseItemQty(index)
 
   // calculate total
+  let subtotal;
+  const shipping = 5;
   let total;
+  let discount = 0;
+
   if (props.items.length) {
-    total = props.items.map(i => i.price * i.quantity).reduce((total, amount) => total + amount)
+    subtotal = props.items.map(i => i.price * i.quantity).reduce((total, amount) => total + amount) // multiply cost by quantity for each item, then add all the items up
+
+    if (props.appliedDiscountCode > 0) { // if a discount code has been applied
+      total = (subtotal + shipping) * ((100 - props.appliedDiscountCode) / 100)
+      discount = (subtotal + shipping) * (props.appliedDiscountCode / 100)
+
+    } else { // else if no discount code has been applied
+      total = subtotal + shipping
+    }
+
   }
 
   return (
@@ -64,11 +79,17 @@ const Cart = props => {
             // if the cart contains items, display shipping btn - else, display empty message
             props.items.length ? (
               <React.Fragment>
-                <p className="text-right"><small>Subtotal: ${total}</small></p>
-                <p className="text-right"><small>Shipping (US only): $5</small></p>
+                <p className="text-right"><small>Subtotal: ${subtotal.toFixed(2)}</small></p>
+                <p className="text-right"><small>Shipping (US only): ${shipping.toFixed(2)}</small></p>
+                {
+                  props.appliedDiscountCode > 0 && (
+                    <p className="text-right"><small>Discount: ${discount.toFixed(2)}</small></p>
+                  )
+                }
                 <hr />
-                <p className="text-right font-weight-bold">Total: ${total + 5}</p>
-                <div className="btn btn-primary btn-block" onClick={props.showShipping}>Step 2: Shipping Info
+                <p className="text-right font-weight-bold">Total: ${total.toFixed(2)}</p>
+                <DiscountCodeForm />
+                <div className="btn btn-primary btn-block my-3" onClick={props.showShipping}>Step 2: Shipping Info
                   <FontAwesomeIcon className="ml-3" icon="chevron-right" />
                 </div>
               </React.Fragment>
@@ -78,13 +99,18 @@ const Cart = props => {
       </div>
       <Shipping />
       <Checkout total={total} />
+      {
+        props.checkoutComplete && <ThankYou />
+      }
     </div>
   );
 }
 
 const mapStateToProps = state => ({
   cartOpen: state.cart.cartOpen,
-  items: state.cart.cartItems
+  items: state.cart.cartItems,
+  checkoutComplete: state.cart.checkoutComplete,
+  appliedDiscountCode: state.cart.appliedDiscountCode,
 })
 
 export default connect(mapStateToProps, { closeCart, cartRemoveItem, showShipping, cartIncreaseItemQty, cartDecreaseItemQty })(Cart)

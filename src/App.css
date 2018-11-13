@@ -1,10 +1,12 @@
 :root {
   --uls-blue: #434f69;
+  --uls-blue-dark: #333d50;
   --z-index-GridItem: 10;
   --z-index-FullView: 30;
   --z-index-cart: 70;
   --z-index-shipping: 80;
   --z-index-checkout: 90;
+  --z-index-ThankYou: 100;
 }
 
 *, *:before, *:after {

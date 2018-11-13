@@ -16,22 +16,20 @@ export default function itemReducer(state = initialState, action) {
           txt.innerHTML = html;
           return txt.value;
         }
-        const fullURLs = i.acf.images ? i.acf.images.map(i => `https://unitedlutheranseminary.edu${i.image}`) : null
+        const primaryImg = i._embedded ? `https://unitedlutheranseminary.edu${i._embedded['wp:featuredmedia'][0].source_url}` : null // add the full URL to the featured image
+        const secondaryImgs = i.acf.images ? i.acf.images.map(i => `https://unitedlutheranseminary.edu${i.image}`) : null // add the full URL to each secondary image
+        if (primaryImg && secondaryImgs) secondaryImgs.unshift(primaryImg) // add the primary image to the secondary images array
+
         const a = {
           id: i.id,
           title: decodeHtml(i.title.rendered),
-          thumbnail: i._embedded ? `https://unitedlutheranseminary.edu${i._embedded['wp:featuredmedia'][0].source_url}` : null,
+          thumbnail: primaryImg,
           desc: i.acf.description,
-          images: fullURLs,
+          images: secondaryImgs ? secondaryImgs : [primaryImg], // if there are no secondary images, make this a single-item array with the primary image
           sizes: i.acf.sizes,
-          price: i.acf.price
+          price: i.acf.price,
+          inStock: i.acf.in_stock
         }
-
-        // a.colors = a.colors.map(i => {
-        //   const fullURLs = i.images.map(img => `https://unitedlutheranseminary.edu${img.image}`)
-        //   i.fullURLs = fullURLs;
-        //   return i;
-        // })
 
         return a;
       })

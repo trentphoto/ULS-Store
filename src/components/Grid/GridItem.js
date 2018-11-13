@@ -7,9 +7,9 @@ const GridItem = props => {
   const { item } = props
 
   return (
-    <div className="GridItem" onClick={props.showFullItem.bind(this, item.id)}>
+    <div className="GridItem" onClick={props.showFullItem.bind(this, item.id)} tabIndex={props.key}>
       <div className="GridItem__overlay">
-        <div className="GridItem__title" dangerouslySetInnerHTML={{__html: item.title}} /> 
+        <div className="GridItem__title" dangerouslySetInnerHTML={{__html: item.title}} />
       </div>
       <div className="GridItem__image">
         <img src={item.thumbnail} alt={item.title} />

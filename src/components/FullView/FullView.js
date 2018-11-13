@@ -16,7 +16,8 @@ class FullView extends React.Component {
       selectedSize: null,
       selectedQuantity: 1,
       currentItemID: null,
-      mainImageUrl: null
+      mainImageUrl: null,
+      func: this._imageGallery
     }
   }
   static getDerivedStateFromProps(props, state){
@@ -34,6 +35,12 @@ class FullView extends React.Component {
   updateSize = size => {
     if (this.props.item.sizes.length > 1){
       this.setState({selectedSize: size})
+    }
+  }
+
+  resetGalleryIndex = () => {
+    if (this._imageGallery) {
+      this._imageGallery.slideToIndex(0);
     }
   }
 
@@ -97,6 +104,8 @@ class FullView extends React.Component {
       return null;
     }
 
+    this.resetGalleryIndex()
+
     return (
       <div className={classnames('FullView', {
         'FullView_open': this.props.showFullView
@@ -108,15 +117,8 @@ class FullView extends React.Component {
         items={this.secondaryImagesArr(item)}
         showPlayButton={false}
         showFullscreenButton={false}
+        ref={i => this._imageGallery = i}
       />
-      {/* <div className="FullView__image">
-        <img src={this.state.mainImageUrl} alt={item.title} />
-      </div>
-      <div className="FullView__image-gallery">
-        {
-          this.secondaryImages(item)
-        }
-      </div> */}
     </div>
     <div className={classnames('FullView__right', {
       'FullView__right_open': this.props.showFullView
@@ -127,8 +129,14 @@ class FullView extends React.Component {
     <h2>
       {item.title}
     </h2>
+    <div className="font-weight-bold mb-3">
+      ${item.price}
+      {
+        item.inStock ? <div className="badge badge-success ml-3">In Stock</div> : <div className="badge badge-danger ml-3">Out of Stock</div>
+      }
+    </div>
     <div dangerouslySetInnerHTML={{__html: item.desc}} />
-    <div className="font-weight-bold mb-3">${item.price}</div>
+
     <div className="FullView__btn-group mb-3">
       {
         item.sizes.map(i => (
@@ -153,7 +161,7 @@ class FullView extends React.Component {
       </button>
     </div>
 
-    <button disabled={!this.state.selectedSize} className="btn FullView__AddToCartBtn" onClick={this.addToCart}>
+    <button disabled={!this.state.selectedSize || !item.inStock} className="btn FullView__AddToCartBtn" onClick={this.addToCart}>
       + Add to Cart
     </button>
   </div>

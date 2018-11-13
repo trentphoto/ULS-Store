@@ -10,6 +10,9 @@ import {
   CART_INCREASE,
   CART_DECREASE,
   SUBMIT_SHIPPING_INFO,
+  CHECKOUT_COMPLETE,
+  GET_DISCOUNT_CODES_SUCCESS,
+  APPLY_DISCOUNT,
 } from '../actions/cartActions'
 
 const initialState = {
@@ -18,10 +21,24 @@ const initialState = {
   showShipping: false,
   showCheckout: false,
   shippingInfo: {},
+  checkoutComplete: false,
+  discountCodes: [],
+  appliedDiscountCode: 0,
 }
 
 export default function cartReducer(state = initialState, action){
   switch (action.type) {
+    case GET_DISCOUNT_CODES_SUCCESS:
+      const codes = action.payload.acf.discount_codes.map(i => i.discount_code)
+      return {
+        ...state,
+        discountCodes: codes
+      };
+    case APPLY_DISCOUNT:
+      return {
+        ...state,
+        appliedDiscountCode: action.payload
+      };
     case OPEN_CART:
       return {
         ...state,
@@ -35,10 +52,10 @@ export default function cartReducer(state = initialState, action){
         showCheckout: false,
       };
     case CART_ADD_ITEM:
-      if (state.cartItems.length === 0) {
+      if (state.cartItems.length === 0) { // if the cart was previously empty
         return {
           ...state,
-          cartItems: [action.payload]
+          cartItems: [action.payload] // add only the new item
         };
       }
 
@@ -49,7 +66,7 @@ export default function cartReducer(state = initialState, action){
       const newCart = oldCart.map((i, index) => {
         if (i.id === action.payload.id && i.size === action.payload.size) {
           match = true
-          i.quantity = i.quantity + action.payload.quantity
+          i.quantity = i.quantity + action.payload.quantity // if the item is already in the cart we only update the quantity
         }
         return i;
       })
@@ -58,9 +75,9 @@ export default function cartReducer(state = initialState, action){
       if (match) {
         return {
           ...state,
-          cartItems: newCart
+          cartItems: newCart // return new cart with updated quantity
         };
-      } else {
+      } else { // else if the item wasn't already in the cart, return the previous cart items along with the new one
         return {
           ...state,
           cartItems: [...state.cartItems, action.payload]
@@ -118,6 +135,11 @@ export default function cartReducer(state = initialState, action){
       return {
         ...state,
         shippingInfo: action.payload
+      };
+    case CHECKOUT_COMPLETE:
+      return {
+        ...state,
+        checkoutComplete: true,
       };
     default:
       return state;

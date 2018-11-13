@@ -1,39 +1,78 @@
 import React, {Component} from 'react';
 import {CardElement, injectStripe} from 'react-stripe-elements';
+import { connect } from 'react-redux'
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+
+import { completeCheckout } from '../../actions/cartActions'
 
 class CheckoutForm extends Component {
   constructor(props) {
     super(props);
-    this.state = {complete: false};
+    this.state = {
+      submitting: false,
+      done: false,
+      error: false
+    };
     this.submit = this.submit.bind(this);
   }
 
   async submit(ev) {
-    const { total } = this.props
+
+    this.setState({submitting: true});
+
+    const { total, completeCheckout, cartItems } = this.props
     let { token } = await this.props.stripe.createToken({name: "James"});
-    let response = await fetch("/charge", {
+
+    const cartItemDescriptions = cartItems.map(i => i.name)
+    const orderDescription = cartItemDescriptions.join()
+
+    let response = await fetch("https://node-uls.herokuapp.com/charge", {
       method: "POST",
       headers: {"Content-Type": "text/plain"},
       body: JSON.stringify({
         token: token.id,
-        amount: total * 100
+        amount: total * 100,
+        desc: 'ULS Online Store'
       })
     });
 
-    if (response.ok) console.log(response)
-    if (response.ok) this.setState({complete: true});
+    if (response.ok) {
+      this.setState({done: true})
+      completeCheckout()
+    } else {
+      this.setState({submitting: false})
+      this.setState({error: true})
+    }
   }
 
   render() {
-    if (this.state.complete) return <h1>Purchase Complete</h1>;
 
     return (
       <div className="checkout">
-        <CardElement />
-        <button className="btn btn-warning btn-block font-weight-bold" onClick={this.submit}>Complete Purchase</button>
+        {
+          !this.props.checkoutComplete && ( // this line makes the button disappear after submission is complete
+            <React.Fragment>
+              <CardElement className="CardElement" />
+              <button className="btn btn-warning btn-block font-weight-bold CheckoutBtn" onClick={this.submit}>
+                {
+                  this.state.submitting ? <FontAwesomeIcon className="checkout__submitting" icon="spinner" /> : <span>Complete Purchase</span>
+                }
+              </button>
+              {
+                this.state.error && <p>Your payment could not be processed. Please try again.</p>
+              }
+            </React.Fragment>
+          )
+        }
       </div>
     );
   }
 }
 
-export default injectStripe(CheckoutForm);
+const mapStateToProps = state => ({
+  checkoutComplete: state.cart.checkoutComplete,
+  cartItems: state.cart.cartItems
+})
+
+export default connect(mapStateToProps, { completeCheckout })(injectStripe(CheckoutForm));

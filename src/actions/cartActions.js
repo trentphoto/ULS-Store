@@ -1,3 +1,7 @@
+import axios from 'axios'
+
+export const GET_DISCOUNT_CODES_SUCCESS = 'GET_DISCOUNT_CODES_SUCCESS'
+export const APPLY_DISCOUNT = 'APPLY_DISCOUNT'
 export const OPEN_CART = 'OPEN_CART'
 export const CLOSE_CART = 'CLOSE_CART'
 export const CART_ADD_ITEM = 'CART_ADD_ITEM'
@@ -9,7 +13,23 @@ export const HIDE_CHECKOUT = 'HIDE_CHECKOUT'
 export const CART_INCREASE = 'CART_INCREASE'
 export const CART_DECREASE = 'CART_DECREASE'
 export const SUBMIT_SHIPPING_INFO = 'SUBMIT_SHIPPING_INFO'
+export const CHECKOUT_COMPLETE = 'CHECKOUT_COMPLETE'
 
+const ApiUrlCodes = 'https://unitedlutheranseminary.edu/wp-json/acf/v3/options/options'
+
+export const getDiscountCodes = () => async dispatch => {
+  const res = await axios.get(ApiUrlCodes)
+  dispatch({
+    type: GET_DISCOUNT_CODES_SUCCESS,
+    payload: res.data
+  })
+}
+export const applyDiscount = percentage => dispatch => {
+  dispatch({
+    type: APPLY_DISCOUNT,
+    payload: percentage
+  })
+}
 export const openCart = () => dispatch => {
   dispatch({
     type: OPEN_CART
@@ -68,5 +88,10 @@ export const submitShippingInfo = shippingInfo => dispatch => {
   dispatch({
     type: SUBMIT_SHIPPING_INFO,
     payload: shippingInfo
+  })
+}
+export const completeCheckout = () => dispatch => {
+  dispatch({
+    type: CHECKOUT_COMPLETE
   })
 }
