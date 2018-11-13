@@ -50,9 +50,8 @@ class CheckoutForm extends Component {
       fetch("https://hooks.zapier.com/hooks/catch/623075/ee9etx/", {
         method: 'POST',
         body: JSON.stringify(orderInfo)
-      }).then(() => console.log(1))
+      })
 
-      // set app state to checked out - show thank you page
       completeCheckout()
 
     } else {
