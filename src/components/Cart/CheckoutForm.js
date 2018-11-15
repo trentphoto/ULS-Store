@@ -19,14 +19,27 @@ class CheckoutForm extends Component {
 
   async submit(ev) {
 
+    const { total, completeCheckout, cartItems, shippingInfo } = this.props
+
     this.setState({submitting: true});
 
-    const { total, completeCheckout, cartItems, shippingInfo } = this.props
+    // set up order info
+
+    const orderNumber = Math.ceil((Math.random().toFixed(5))*100000) // random number of 5 decimal places, multiplied by 10^6, rounded using .ceil()
+    const orderDate = new Date().toString()
+    const orderItems = cartItems.map(i => ({
+      'Name': i.name,
+      'Quantity': i.quantity,
+      'Size': i.size,
+      'Price Each': i.price
+    }))
+
     let { token } = await this.props.stripe.createToken({name: "James"});
 
     // const cartItemDescriptions = cartItems.map(i => i.name)
     // const orderDescription = cartItemDescriptions.join()
 
+    // send the stripe request
     let response = await fetch("https://node-uls.herokuapp.com/charge", {
       method: "POST",
       headers: {"Content-Type": "text/plain"},
@@ -37,13 +50,15 @@ class CheckoutForm extends Component {
       })
     });
 
-    if (response.ok) {
+    if (response.ok) { // if stripe succeeds, process the order
       this.setState({done: true})
 
       const orderInfo = {
         'shippingInfo': shippingInfo,
         'order total': total,
-        'cartItems': cartItems,
+        'cartItems': orderItems,
+        'orderNumber': orderNumber,
+        'orderDate': orderDate,
       }
 
       // send order to zapier

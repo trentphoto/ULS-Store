@@ -23,6 +23,22 @@ const Checkout = props => {
         </div>
         <div className="m-5">
           {/* stripe checkout form */}
+          <h4>Review your order</h4>
+          {
+            props.items.map((i, index) => (
+              <div className="Cart__item" key={index}>
+                <div className="Cart__itemInfo">
+                  <span className="Cart__itemName">{i.name}</span>
+                  {i.size !== 'generic' ? <small>Size: {i.size}</small> : ''}
+                </div>
+                <div className="Cart__itemQuantity">
+                  {i.quantity}
+                </div>
+              </div>
+              ))
+          }
+          <p className="text-right font-weight-bold mt-3">Total: ${props.total}</p>
+          <h4 className="mt-5 mb-3">Payment Information</h4>
           <Elements>
             <CheckoutForm total={props.total} />
           </Elements>
@@ -35,6 +51,7 @@ const Checkout = props => {
 
 const mapStateToProps = state => ({
   show: state.cart.showCheckout,
+  items: state.cart.cartItems,
 })
 
 export default connect(mapStateToProps, { closeCart, hideCheckout })(Checkout)
