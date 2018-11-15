@@ -9,7 +9,7 @@ import './Shipping.css'
 
 const Checkout = props => {
   return (
-    <StripeProvider apiKey="pk_test_MfkbDaiCvZdzlbXMqEdg6jqq">
+    <StripeProvider apiKey="pk_live_oQzZISPAmY77Cynuj1jUurJ3">
       <div className={classnames('Checkout', {
         'Checkout_open': props.show
       })}>
@@ -37,7 +37,7 @@ const Checkout = props => {
               </div>
               ))
           }
-          <p className="text-right font-weight-bold mt-3">Total: ${props.total}</p>
+          <p className="text-right font-weight-bold mt-3">Total: ${props.total.toFixed(2)}</p>
           <h4 className="mt-5 mb-3">Payment Information</h4>
           <Elements>
             <CheckoutForm total={props.total} />
