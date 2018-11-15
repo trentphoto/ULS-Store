@@ -24,8 +24,8 @@ class CheckoutForm extends Component {
     const { total, completeCheckout, cartItems, shippingInfo } = this.props
     let { token } = await this.props.stripe.createToken({name: "James"});
 
-    const cartItemDescriptions = cartItems.map(i => i.name)
-    const orderDescription = cartItemDescriptions.join()
+    // const cartItemDescriptions = cartItems.map(i => i.name)
+    // const orderDescription = cartItemDescriptions.join()
 
     let response = await fetch("https://node-uls.herokuapp.com/charge", {
       method: "POST",
@@ -73,6 +73,9 @@ class CheckoutForm extends Component {
                   this.state.submitting ? <FontAwesomeIcon className="checkout__submitting" icon="spinner" /> : <span>Complete Purchase</span>
                 }
               </button>
+              {
+                this.state.submitting && <p>Processing...</p>
+              }
               {
                 this.state.error && <p>Your payment could not be processed. Please try again.</p>
               }

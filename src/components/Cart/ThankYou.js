@@ -1,13 +1,12 @@
 import React from 'react'
 import './ThankYou.css'
-import logo from '../../img/logo.svg'
 
 const ThankYou = props => (
   <div className="ThankYou">
     <div className="container">
       <div className="row">
         <div className="col-12">
-          <img src={logo} className="ThankYou__logo d-block mx-auto"/>
+          <img src="http://unitedlutheranseminary.edu/wp-content/themes/uls/images/logo-blue-stacked.svg" alt="United Lutheran Seminary" className="ThankYou__logo d-block mx-auto"/>
         </div>
       </div>
       <div className="row">
