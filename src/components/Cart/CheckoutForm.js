@@ -35,7 +35,7 @@ class CheckoutForm extends Component {
       'Price Each': i.price
     }))
 
-    this.props.stripe.createToken({name: "James"}).then(async ({token, error}) => {
+    this.props.stripe.createToken({name: `${shippingInfo.firstName} ${shippingInfo.lastName}`}).then(async ({token, error}) => {
       if (error) {
 
         this.setState({submitting: false})
@@ -43,13 +43,17 @@ class CheckoutForm extends Component {
 
       } else { // if the token is successfully created
 
+        // create description
+        const cartItemNames = cartItems.map(i => i.name)
+        const orderDescription = cartItemNames.join()
+
         let response = await fetch("https://node-uls.herokuapp.com/charge", {
           method: "POST",
           headers: {"Content-Type": "text/plain"},
           body: JSON.stringify({
             token: token.id,
             amount: total * 100,
-            desc: 'ULS Online Store'
+            desc: `ULS Online Store: ${orderDescription}`
           })
         });
         // send the stripe request
@@ -81,10 +85,6 @@ class CheckoutForm extends Component {
 
       }
     })
-
-    // const cartItemNames = cartItems.map(i => i.name)
-    // const orderDescription = cartItemNames.join()
-
 
   }
 
