@@ -53,7 +53,7 @@ class CheckoutForm extends Component {
           body: JSON.stringify({
             token: token.id,
             amount: total * 100,
-            desc: `ULS Online Store: ${orderDescription}`
+            desc: 'ULS Online Store'
           })
         });
         // send the stripe request
