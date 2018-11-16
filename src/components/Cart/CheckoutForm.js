@@ -12,7 +12,7 @@ class CheckoutForm extends Component {
     this.state = {
       submitting: false,
       done: false,
-      error: false
+      error: '',
     };
     this.submit = this.submit.bind(this);
   }
@@ -22,6 +22,7 @@ class CheckoutForm extends Component {
     const { total, completeCheckout, cartItems, shippingInfo } = this.props
 
     this.setState({submitting: true});
+    this.setState({error: ''});
 
     // set up order info
 
@@ -34,45 +35,57 @@ class CheckoutForm extends Component {
       'Price Each': i.price
     }))
 
-    let { token } = await this.props.stripe.createToken({name: "James"});
+    this.props.stripe.createToken({name: "James"}).then(async ({token, error}) => {
+      if (error) {
 
-    // const cartItemDescriptions = cartItems.map(i => i.name)
-    // const orderDescription = cartItemDescriptions.join()
+        this.setState({submitting: false})
+        this.setState({error: error.message})
 
-    // send the stripe request
-    let response = await fetch("https://node-uls.herokuapp.com/charge", {
-      method: "POST",
-      headers: {"Content-Type": "text/plain"},
-      body: JSON.stringify({
-        token: token.id,
-        amount: total * 100,
-        desc: 'ULS Online Store'
-      })
-    });
+      } else { // if the token is successfully created
 
-    if (response.ok) { // if stripe succeeds, process the order
-      this.setState({done: true})
+        let response = await fetch("https://node-uls.herokuapp.com/charge", {
+          method: "POST",
+          headers: {"Content-Type": "text/plain"},
+          body: JSON.stringify({
+            token: token.id,
+            amount: total * 100,
+            desc: 'ULS Online Store'
+          })
+        });
+        // send the stripe request
 
-      const orderInfo = {
-        'shippingInfo': shippingInfo,
-        'order total': total,
-        'cartItems': orderItems,
-        'orderNumber': orderNumber,
-        'orderDate': orderDate,
+        if (response.ok) { // if stripe succeeds, process the order
+          this.setState({done: true})
+          this.setState({error: ''})
+
+          const orderInfo = {
+            'shippingInfo': shippingInfo,
+            'order total': total,
+            'cartItems': orderItems,
+            'orderNumber': orderNumber,
+            'orderDate': orderDate,
+          }
+
+          // send order to zapier
+          fetch("https://hooks.zapier.com/hooks/catch/623075/ee9etx/", {
+            method: 'POST',
+            body: JSON.stringify(orderInfo)
+          })
+
+          completeCheckout()
+
+        } else {
+          this.setState({submitting: false})
+          this.setState({error: 'Your payment could not be processed. Please try again.'})
+        }
+
       }
+    })
 
-      // send order to zapier
-      fetch("https://hooks.zapier.com/hooks/catch/623075/ee9etx/", {
-        method: 'POST',
-        body: JSON.stringify(orderInfo)
-      })
+    // const cartItemNames = cartItems.map(i => i.name)
+    // const orderDescription = cartItemNames.join()
 
-      completeCheckout()
 
-    } else {
-      this.setState({submitting: false})
-      this.setState({error: true})
-    }
   }
 
   render() {
@@ -92,7 +105,7 @@ class CheckoutForm extends Component {
                 this.state.submitting && <p>Processing...</p>
               }
               {
-                this.state.error && <p>Your payment could not be processed. Please try again.</p>
+                this.state.error && <p className="text-danger">{this.state.error}</p>
               }
             </React.Fragment>
           )
